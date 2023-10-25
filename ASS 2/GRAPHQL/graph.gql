@@ -1,0 +1,115 @@
+# Represents a user in the system (HoD, Supervisor, Employee)
+type User {
+    id: ID!
+    username: String!
+    password: String! # This should be hashed and securely stored in practice
+    firstName: String!
+    lastName: String!
+    jobTitle: String
+    position: String
+    role: UserRole!
+    department: Department
+    kpis: [KPI]
+}
+
+# Represents authentication information for a user
+type Auth {
+    token: String!
+    user: User
+}
+
+# Enum to distinguish user roles
+enum UserRole {
+    HoD
+    Supervisor
+    Employee
+}
+
+# Represents a department
+type Department {
+    id: ID!
+    name: String!
+    hod: User
+    objectives: [DepartmentObjective]
+    users: [User]
+}
+
+# Represents objectives for a department
+type DepartmentObjective {
+    id: ID!
+    name: String!
+    weight: Float!
+    department: Department!
+    relatedKPIs: [KPI]
+}
+
+# Represents Key Performance Indicators for users
+type KPI {
+    id: ID!
+    user: User!
+    name: String!
+    metric: String
+    unit: String
+    score: Float
+    relatedObjectives: [DepartmentObjective]
+}
+
+# Supervisor's grading for an employee's KPI
+type SupervisorGrade {
+    supervisor: User!
+    kpi: KPI!
+    grade: Float!
+}
+
+# Feedback provided by an employee about their supervisor
+type EmployeeSupervisorFeedback {
+    employee: User!
+    supervisor: User!
+    grade: Float!
+    feedback: String
+}
+
+# Queries
+type Query {
+    user(id: ID!): User
+    users: [User]
+    department(id: ID!): Department
+    departments: [Department]
+    departmentObjective(id: ID!): DepartmentObjective
+    departmentObjectives: [DepartmentObjective]
+    kpi(id: ID!): KPI
+    kpis: [KPI]
+}
+
+# Mutations
+type Mutation {
+    # Authentication
+    login(username: String!, password: String!): Auth!
+    logout(token: String!): Boolean!
+
+    # User related
+    createUser(username: String!, password: String!, firstName: String!, lastName: String!, jobTitle: String, position: String, role: UserRole!, departmentId: ID!): User
+    updateUser(id: ID!, username: String, password: String, firstName: String, lastName: String, jobTitle: String, position: String, role: UserRole, departmentId: ID): User
+    deleteUser(id: ID!): Boolean
+
+    # Department related
+    createDepartment(name: String!): Department
+    updateDepartment(id: ID!, name: String): Department
+    deleteDepartment(id: ID!): Boolean
+
+    # Department Objective related
+    createDepartmentObjective(name: String!, weight: Float!, departmentId: ID!): DepartmentObjective
+    updateDepartmentObjective(id: ID!, name: String, weight: Float): DepartmentObjective
+    deleteDepartmentObjective(id: ID!): Boolean
+
+    # KPI related
+    createKPI(userId: ID!, name: String!, metric: String, unit: String): KPI
+    updateKPI(id: ID!, name: String, metric: String, unit: String, score: Float): KPI
+    deleteKPI(id: ID!): Boolean
+
+    # Supervisor actions
+    gradeKPI(supervisorId: ID!, kpiId: ID!, grade: Float!): SupervisorGrade
+
+    # Employee actions
+    provideFeedback(employeeId: ID!, supervisorId: ID!, grade: Float!, feedback: String): EmployeeSupervisorFeedback
+}
