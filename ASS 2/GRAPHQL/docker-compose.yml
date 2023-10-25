@@ -1,0 +1,26 @@
+# Use root/example as user/password credentials
+version: '5.7.43'
+
+services:
+  mysql:
+    image: mysql:5.7.43
+    container_name: assignment-2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: assignment-2-p1
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "ping", "mysqladmin", "localhost", "-h"]
+      interval: 1m30s
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:      
