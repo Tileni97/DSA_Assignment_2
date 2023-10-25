@@ -1,0 +1,14 @@
+# Use the official Ballerina base image
+FROM ballerina/ballerina:latest
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy local code to the container image
+COPY . .
+
+# Build the Ballerina project
+RUN bal build --skip-tests
+
+# Specify the command to run on container start
+CMD ["bal", "run", "client.bal"]
