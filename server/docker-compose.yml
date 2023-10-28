@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:5.7.43
+    container_name: DSA_Assignment_2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: assignment_2
+      MYSQL_USER: user
+      MYSQL_PASSWORD: "@Tessa97"
+    healthcheck:
+      test: ["CMD", "ping", "mysqladmin", "localhost", "-h"]
+      interval: 1m30s
+      timeout: 20s
+      retries: 10
+      start_period: 20s
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  ballerina-service:
+    build:
+      context: C:\Users\Chang\OneDrive\Documents\GitHub\DSA_Assignment_2\service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+
+  client:
+    build:
+      context: C:\Users\Chang\OneDrive\Documents\GitHub\DSA_Assignment_2\client
+    ports:
+      - "8082:8082"  # Updated port mapping
+    depends_on:
+      - ballerina-service
+
+volumes:
+  mysql-data:
